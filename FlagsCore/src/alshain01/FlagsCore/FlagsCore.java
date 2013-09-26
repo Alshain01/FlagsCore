@@ -36,6 +36,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.weather.LightningStrikeEvent;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import alshain01.Flags.Flag;
@@ -56,6 +57,13 @@ public class FlagsCore extends JavaPlugin {
 	 */
 	@Override
 	public void onEnable(){
+		PluginManager pm =  Bukkit.getServer().getPluginManager();
+
+		if(!pm.isPluginEnabled("Flags")) {
+		    this.getLogger().severe("Flags was not found. Shutting down.");
+		    pm.disablePlugin(this);
+		}
+		
 		// Connect to the data file
 		ModuleYML dataFile = new ModuleYML(this, "flags.yml");
 		
