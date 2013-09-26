@@ -110,8 +110,9 @@ public class FlagsCore extends JavaPlugin {
 		 */
 		@EventHandler(ignoreCancelled = true)
 		private void onEntityRegainHealth(EntityRegainHealthEvent e){
-			if((e.getEntity() instanceof Player)) { 
-				e.setCancelled(!Director.getAreaAt(e.getEntity().getLocation()).getValue(Flags.instance.getRegistrar().getFlag("Healing"), false));
+			Flag flag = Flags.instance.getRegistrar().getFlag("Healing");
+			if(flag != null && e.getEntity() instanceof Player) { 
+				e.setCancelled(!Director.getAreaAt(e.getEntity().getLocation()).getValue(flag, false));
 			}
 		}
 
@@ -120,8 +121,12 @@ public class FlagsCore extends JavaPlugin {
 		 */
 		@EventHandler(ignoreCancelled = true)
 		private void onFoodLevelChange(FoodLevelChangeEvent e){
-			if((e.getEntity() instanceof Player) && e.getFoodLevel() < ((Player)e.getEntity()).getFoodLevel()) {
-				e.setCancelled(!Director.getAreaAt(e.getEntity().getLocation()).getValue(Flags.instance.getRegistrar().getFlag("Hunger"), false));
+			Flag flag = Flags.instance.getRegistrar().getFlag("Hunger");
+			if(flag != null) {
+				// Make sure it's a player and make sure the hunger bar is going down, not up.
+				if ((e.getEntity() instanceof Player) && e.getFoodLevel() < ((Player)e.getEntity()).getFoodLevel()) {
+					e.setCancelled(!Director.getAreaAt(e.getEntity().getLocation()).getValue(flag, false));
+				}
 			}
 		}
 		
@@ -130,7 +135,10 @@ public class FlagsCore extends JavaPlugin {
 		 */
 		@EventHandler(ignoreCancelled = true)
 		private void onLightningStrike(LightningStrikeEvent e) {
-			e.setCancelled(!Director.getAreaAt(e.getLightning().getLocation()).getValue(Flags.instance.getRegistrar().getFlag("Lightning"), false));
+			Flag flag = Flags.instance.getRegistrar().getFlag("Lightning");
+			if(flag != null) {
+				e.setCancelled(!Director.getAreaAt(e.getLightning().getLocation()).getValue(flag, false));
+			}
 		}
 		
 		/*
@@ -138,8 +146,11 @@ public class FlagsCore extends JavaPlugin {
 		 */
 		@EventHandler(ignoreCancelled = true)
 		private void onEnchantItem(EnchantItemEvent e) {
-			if(!Director.getAreaAt(e.getEnchantBlock().getLocation()).getValue(Flags.instance.getRegistrar().getFlag("SpendExp"), false)) {
-				e.setExpLevelCost(0);
+			Flag flag = Flags.instance.getRegistrar().getFlag("Lightning");
+			if (flag != null) {
+				if(!Director.getAreaAt(e.getEnchantBlock().getLocation()).getValue(flag, false)) {
+					e.setExpLevelCost(0);
+				}
 			}
 		}
 	}
