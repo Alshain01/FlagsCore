@@ -68,7 +68,7 @@ public class FlagsCore extends JavaPlugin {
 		ModuleYML dataFile = new ModuleYML(this, "flags.yml");
 		
 		// Register with Flags
-		Registrar flags = Flags.instance.getRegistrar();
+		Registrar flags = Flags.getRegistrar();
 		for(String f : dataFile.getModuleData().getConfigurationSection("Flag").getKeys(false)) {
 			ConfigurationSection data = dataFile.getModuleData().getConfigurationSection("Flag." + f);
 			
@@ -96,7 +96,7 @@ public class FlagsCore extends JavaPlugin {
 		 */
 		@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 		private void onPlayerDeath(PlayerDeathEvent e) {
-			Flag flag = Flags.instance.getRegistrar().getFlag("KeepExpOnDeath");
+			Flag flag = Flags.getRegistrar().getFlag("KeepExpOnDeath");
 			if (flag != null && Director.getAreaAt(e.getEntity().getLocation()).getValue(flag, false)) {
 				e.setKeepLevel(true);
 			}
@@ -107,7 +107,7 @@ public class FlagsCore extends JavaPlugin {
 		 */
 		@EventHandler(ignoreCancelled = true)
 		private void onEntityBreakDoor(EntityBreakDoorEvent e) {
-			Flag flag = Flags.instance.getRegistrar().getFlag("DoorBreak");
+			Flag flag = Flags.getRegistrar().getFlag("DoorBreak");
 			if (flag != null) {
 				e.setCancelled(!Director.getAreaAt(e.getEntity().getLocation()).getValue(flag, false));
 			}
@@ -118,7 +118,7 @@ public class FlagsCore extends JavaPlugin {
 		 */
 		@EventHandler(ignoreCancelled = true)
 		private void onEntityRegainHealth(EntityRegainHealthEvent e){
-			Flag flag = Flags.instance.getRegistrar().getFlag("Healing");
+			Flag flag = Flags.getRegistrar().getFlag("Healing");
 			if(flag != null && e.getEntity() instanceof Player) { 
 				e.setCancelled(!Director.getAreaAt(e.getEntity().getLocation()).getValue(flag, false));
 			}
@@ -129,7 +129,7 @@ public class FlagsCore extends JavaPlugin {
 		 */
 		@EventHandler(ignoreCancelled = true)
 		private void onFoodLevelChange(FoodLevelChangeEvent e){
-			Flag flag = Flags.instance.getRegistrar().getFlag("Hunger");
+			Flag flag = Flags.getRegistrar().getFlag("Hunger");
 			if(flag != null) {
 				// Make sure it's a player and make sure the hunger bar is going down, not up.
 				if ((e.getEntity() instanceof Player) && e.getFoodLevel() < ((Player)e.getEntity()).getFoodLevel()) {
@@ -143,7 +143,7 @@ public class FlagsCore extends JavaPlugin {
 		 */
 		@EventHandler(ignoreCancelled = true)
 		private void onLightningStrike(LightningStrikeEvent e) {
-			Flag flag = Flags.instance.getRegistrar().getFlag("Lightning");
+			Flag flag = Flags.getRegistrar().getFlag("Lightning");
 			if(flag != null) {
 				e.setCancelled(!Director.getAreaAt(e.getLightning().getLocation()).getValue(flag, false));
 			}
@@ -154,7 +154,7 @@ public class FlagsCore extends JavaPlugin {
 		 */
 		@EventHandler(ignoreCancelled = true)
 		private void onEnchantItem(EnchantItemEvent e) {
-			Flag flag = Flags.instance.getRegistrar().getFlag("Lightning");
+			Flag flag = Flags.getRegistrar().getFlag("Lightning");
 			if (flag != null) {
 				if(!Director.getAreaAt(e.getEnchantBlock().getLocation()).getValue(flag, false)) {
 					e.setExpLevelCost(0);
