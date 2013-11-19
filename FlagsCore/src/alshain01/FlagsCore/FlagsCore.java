@@ -39,11 +39,11 @@ import org.bukkit.event.weather.LightningStrikeEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import alshain01.Flags.Director;
 import alshain01.Flags.Flag;
 import alshain01.Flags.Flags;
 import alshain01.Flags.ModuleYML;
 import alshain01.Flags.Registrar;
+import alshain01.Flags.area.Area;
 
 /**
  * Flags - Core Module that adds general flags to the plug-in Flags.
@@ -62,7 +62,7 @@ public class FlagsCore extends JavaPlugin {
 		private void onEnchantItem(EnchantItemEvent e) {
 			final Flag flag = Flags.getRegistrar().getFlag("Lightning");
 			if (flag != null) {
-				if (!Director.getAreaAt(e.getEnchantBlock().getLocation()).getValue(flag, false)) {
+				if (!Area.getAt(e.getEnchantBlock().getLocation()).getValue(flag, false)) {
 					e.setExpLevelCost(0);
 				}
 			}
@@ -75,7 +75,7 @@ public class FlagsCore extends JavaPlugin {
 		private void onEntityBreakDoor(EntityBreakDoorEvent e) {
 			final Flag flag = Flags.getRegistrar().getFlag("DoorBreak");
 			if (flag != null) {
-				e.setCancelled(!Director.getAreaAt(e.getEntity().getLocation()).getValue(flag, false));
+				e.setCancelled(!Area.getAt(e.getEntity().getLocation()).getValue(flag, false));
 			}
 		}
 
@@ -86,7 +86,7 @@ public class FlagsCore extends JavaPlugin {
 		private void onEntityRegainHealth(EntityRegainHealthEvent e) {
 			final Flag flag = Flags.getRegistrar().getFlag("Healing");
 			if (flag != null && e.getEntity() instanceof Player) {
-				e.setCancelled(!Director.getAreaAt(e.getEntity().getLocation())
+				e.setCancelled(!Area.getAt(e.getEntity().getLocation())
 						.getValue(flag, false));
 			}
 		}
@@ -102,7 +102,7 @@ public class FlagsCore extends JavaPlugin {
 				// down, not up.
 				if (e.getEntity() instanceof Player
 						&& e.getFoodLevel() < ((Player) e.getEntity()).getFoodLevel()) {
-					e.setCancelled(!Director.getAreaAt(e.getEntity().getLocation()).getValue(flag, false));
+					e.setCancelled(!Area.getAt(e.getEntity().getLocation()).getValue(flag, false));
 				}
 			}
 		}
@@ -114,7 +114,7 @@ public class FlagsCore extends JavaPlugin {
 		private void onLightningStrike(LightningStrikeEvent e) {
 			final Flag flag = Flags.getRegistrar().getFlag("Lightning");
 			if (flag != null) {
-				e.setCancelled(!Director.getAreaAt(e.getLightning().getLocation()).getValue(flag, false));
+				e.setCancelled(!Area.getAt(e.getLightning().getLocation()).getValue(flag, false));
 			}
 		}
 
@@ -125,7 +125,7 @@ public class FlagsCore extends JavaPlugin {
 		private void onPlayerDeath(PlayerDeathEvent e) {
 			final Flag flag = Flags.getRegistrar().getFlag("KeepExpOnDeath");
 			if (flag != null
-					&& Director.getAreaAt(e.getEntity().getLocation()).getValue(flag, false)) {
+					&& Area.getAt(e.getEntity().getLocation()).getValue(flag, false)) {
 				e.setKeepLevel(true);
 			}
 		}
