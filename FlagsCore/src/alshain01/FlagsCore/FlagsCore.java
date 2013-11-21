@@ -35,6 +35,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.entity.EntityBreakDoorEvent;
@@ -51,6 +52,51 @@ import org.bukkit.plugin.java.JavaPlugin;
  * @author Alshain01
  */
 public class FlagsCore extends JavaPlugin {
+	/**
+	 * Called when this module is enabled
+	 */
+	@Override
+	public void onEnable() {
+		final PluginManager pm = Bukkit.getServer().getPluginManager();
+
+		if (!pm.isPluginEnabled("Flags")) {
+			getLogger().severe("Flags was not found. Shutting down.");
+			pm.disablePlugin(this);
+		}
+
+		// Connect to the data file
+		final ModuleYML dataFile = new ModuleYML(this, "flags.yml");
+
+		// Register with Flags
+		final Registrar flags = Flags.getRegistrar();
+		for (final String f : dataFile.getModuleData().getConfigurationSection("Flag").getKeys(false)) {
+			final ConfigurationSection data = dataFile.getModuleData().getConfigurationSection("Flag." + f);
+
+			// The description that appears when using help commands.
+			final String desc = data.getString("Description");
+
+			final boolean def = data.getBoolean("Default");
+
+			// Register it!
+			// Be sure to send a plug-in name or group description for the help
+			// command!
+			// It can be this.getName() or another string.
+			flags.register(f, desc, def, "Core");
+		}
+
+		// Load plug-in events and data
+		Bukkit.getServer().getPluginManager()
+				.registerEvents(new CoreListener(), this);
+	}
+	
+	/**
+	 * Called when this module is disabled
+	 */
+	@Override
+	public void onDisable() {
+		HandlerList.unregisterAll(this);
+	}
+	
 	/*
 	 * The event handlers for the flags we created earlier
 	 */
@@ -60,7 +106,7 @@ public class FlagsCore extends JavaPlugin {
 		 */
 		@EventHandler(ignoreCancelled = true)
 		private void onEnchantItem(EnchantItemEvent e) {
-			final Flag flag = Flags.getRegistrar().getFlag("Lightning");
+			final Flag flag = Flags.getRegistrar().getFlag("SpendExp");
 			if (flag != null) {
 				if (!Area.getAt(e.getEnchantBlock().getLocation()).getValue(flag, false)) {
 					e.setExpLevelCost(0);
@@ -129,42 +175,5 @@ public class FlagsCore extends JavaPlugin {
 				e.setKeepLevel(true);
 			}
 		}
-	}
-
-	/**
-	 * Called when this module is enabled
-	 */
-	@Override
-	public void onEnable() {
-		final PluginManager pm = Bukkit.getServer().getPluginManager();
-
-		if (!pm.isPluginEnabled("Flags")) {
-			getLogger().severe("Flags was not found. Shutting down.");
-			pm.disablePlugin(this);
-		}
-
-		// Connect to the data file
-		final ModuleYML dataFile = new ModuleYML(this, "flags.yml");
-
-		// Register with Flags
-		final Registrar flags = Flags.getRegistrar();
-		for (final String f : dataFile.getModuleData().getConfigurationSection("Flag").getKeys(false)) {
-			final ConfigurationSection data = dataFile.getModuleData().getConfigurationSection("Flag." + f);
-
-			// The description that appears when using help commands.
-			final String desc = data.getString("Description");
-
-			final boolean def = data.getBoolean("Default");
-
-			// Register it!
-			// Be sure to send a plug-in name or group description for the help
-			// command!
-			// It can be this.getName() or another string.
-			flags.register(f, desc, def, "Core");
-		}
-
-		// Load plug-in events and data
-		Bukkit.getServer().getPluginManager()
-				.registerEvents(new CoreListener(), this);
 	}
 }
