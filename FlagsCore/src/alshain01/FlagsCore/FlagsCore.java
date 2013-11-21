@@ -27,15 +27,12 @@ package alshain01.FlagsCore;
 import io.github.alshain01.Flags.Flag;
 import io.github.alshain01.Flags.Flags;
 import io.github.alshain01.Flags.ModuleYML;
-import io.github.alshain01.Flags.Registrar;
 import io.github.alshain01.Flags.area.Area;
 
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.entity.EntityBreakDoorEvent;
@@ -64,37 +61,12 @@ public class FlagsCore extends JavaPlugin {
 			pm.disablePlugin(this);
 		}
 
-		// Connect to the data file
-		final ModuleYML dataFile = new ModuleYML(this, "flags.yml");
-
-		// Register with Flags
-		final Registrar flags = Flags.getRegistrar();
-		for (final String f : dataFile.getModuleData().getConfigurationSection("Flag").getKeys(false)) {
-			final ConfigurationSection data = dataFile.getModuleData().getConfigurationSection("Flag." + f);
-
-			// The description that appears when using help commands.
-			final String desc = data.getString("Description");
-
-			final boolean def = data.getBoolean("Default");
-
-			// Register it!
-			// Be sure to send a plug-in name or group description for the help
-			// command!
-			// It can be this.getName() or another string.
-			flags.register(f, desc, def, "Core");
-		}
+		// Connect to the data file and register the flags
+		Flags.getRegistrar().register(new ModuleYML(this, "flags.yml"), "Core");
 
 		// Load plug-in events and data
 		Bukkit.getServer().getPluginManager()
 				.registerEvents(new CoreListener(), this);
-	}
-	
-	/**
-	 * Called when this module is disabled
-	 */
-	@Override
-	public void onDisable() {
-		HandlerList.unregisterAll(this);
 	}
 	
 	/*

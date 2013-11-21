@@ -4,16 +4,11 @@ Flag:
     Default: false
   Healing:
     Description: Toggles ability to heal.
-    Default: true
   DoorBreak:
     Description: Toggles Zombies breaking doors in a claim on Hard difficulty level.
-    Default: true
   Hunger:
     Description: Toggles getting hungry.
-    Default: true
   SpendExp:
     Description: Toggles exp loss when using enchanting or anvil.
-    Default: true
   Lightning:
     Description: Toggles lightning striking in a claim.
-    Default: true
