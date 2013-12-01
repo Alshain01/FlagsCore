@@ -22,7 +22,7 @@
  http://creativecommons.org/licenses/by-nc/3.0/
  */
 
-package alshain01.FlagsCore;
+package io.github.alshain01.FlagsCore;
 
 import io.github.alshain01.Flags.Flag;
 import io.github.alshain01.Flags.Flags;
