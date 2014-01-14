@@ -30,15 +30,13 @@ import io.github.alshain01.Flags.ModuleYML;
 import io.github.alshain01.Flags.area.Area;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.enchantment.EnchantItemEvent;
-import org.bukkit.event.entity.EntityBreakDoorEvent;
-import org.bukkit.event.entity.EntityRegainHealthEvent;
-import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.weather.LightningStrikeEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -153,5 +151,20 @@ public class FlagsCore extends JavaPlugin {
                 e.getDrops().clear();
             }
 		}
+
+        /*
+         * Handler for Creeper Explosions
+         */
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        private void onEntityExplode(EntityExplodeEvent e) {
+            if(!(e.getEntity() instanceof Creeper)) {
+                return;
+            }
+
+            final Flag flag = Flags.getRegistrar().getFlag("CreeperExplosion");
+            if(flag != null) {
+                e.setCancelled(!Area.getAt(e.getEntity().getLocation()).getValue(flag, false));
+            }
+        }
 	}
 }

@@ -5,6 +5,8 @@ Flag:
   KeepInventory:
     Description: Toggles loss of inventory on death in the area.
     Default: false
+  CreeperExplosion:
+    Description: Toggles damage to blocks and players when a creeper explodes.
   Healing:
     Description: Toggles ability to heal.
   DoorBreak:
