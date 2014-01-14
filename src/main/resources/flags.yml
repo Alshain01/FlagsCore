@@ -1,14 +1,17 @@
 Flag:
   KeepExpOnDeath:
-    Description: Toggles loss of exp on death in claim.
+    Description: Toggles loss of exp on death in the area.
+    Default: false
+  KeepInventory:
+    Description: Toggles loss of inventory on death in the area.
     Default: false
   Healing:
     Description: Toggles ability to heal.
   DoorBreak:
-    Description: Toggles Zombies breaking doors in a claim on Hard difficulty level.
+    Description: Toggles Zombies breaking doors in an area on Hard difficulty level.
   Hunger:
     Description: Toggles getting hungry.
   SpendExp:
     Description: Toggles exp loss when using enchanting or anvil.
   Lightning:
-    Description: Toggles lightning striking in a claim.
+    Description: Toggles lightning striking in an area.

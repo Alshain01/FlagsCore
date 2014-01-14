@@ -141,11 +141,17 @@ public class FlagsCore extends JavaPlugin {
 		 */
 		@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 		private void onPlayerDeath(PlayerDeathEvent e) {
-			final Flag flag = Flags.getRegistrar().getFlag("KeepExpOnDeath");
+			Flag flag = Flags.getRegistrar().getFlag("KeepExpOnDeath");
 			if (flag != null
 					&& Area.getAt(e.getEntity().getLocation()).getValue(flag, false)) {
 				e.setKeepLevel(true);
 			}
+
+            flag = Flags.getRegistrar().getFlag("KeepInventory");
+            if(flag != null
+                    && Area.getAt(e.getEntity().getLocation()).getValue(flag, false)) {
+                e.getDrops().clear();
+            }
 		}
 	}
 }
