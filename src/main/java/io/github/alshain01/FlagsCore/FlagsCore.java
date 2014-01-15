@@ -27,7 +27,7 @@ package io.github.alshain01.FlagsCore;
 import io.github.alshain01.Flags.Flag;
 import io.github.alshain01.Flags.Flags;
 import io.github.alshain01.Flags.ModuleYML;
-import io.github.alshain01.Flags.area.Area;
+import io.github.alshain01.Flags.System;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Creeper;
@@ -40,6 +40,7 @@ import org.bukkit.event.entity.*;
 import org.bukkit.event.weather.LightningStrikeEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+
 
 /**
  * Flags - Core Module that adds general flags to the plug-in Flags.
@@ -78,7 +79,7 @@ public class FlagsCore extends JavaPlugin {
 		private void onEnchantItem(EnchantItemEvent e) {
 			final Flag flag = Flags.getRegistrar().getFlag("SpendExp");
 			if (flag != null) {
-				if (!Area.getAt(e.getEnchantBlock().getLocation()).getValue(flag, false)) {
+				if (!System.getActive().getAreaAt(e.getEnchantBlock().getLocation()).getValue(flag, false)) {
 					e.setExpLevelCost(0);
 				}
 			}
@@ -91,7 +92,7 @@ public class FlagsCore extends JavaPlugin {
 		private void onEntityBreakDoor(EntityBreakDoorEvent e) {
 			final Flag flag = Flags.getRegistrar().getFlag("DoorBreak");
 			if (flag != null) {
-				e.setCancelled(!Area.getAt(e.getEntity().getLocation()).getValue(flag, false));
+				e.setCancelled(!System.getActive().getAreaAt(e.getEntity().getLocation()).getValue(flag, false));
 			}
 		}
 
@@ -102,7 +103,7 @@ public class FlagsCore extends JavaPlugin {
 		private void onEntityRegainHealth(EntityRegainHealthEvent e) {
 			final Flag flag = Flags.getRegistrar().getFlag("Healing");
 			if (flag != null && e.getEntity() instanceof Player) {
-				e.setCancelled(!Area.getAt(e.getEntity().getLocation())
+				e.setCancelled(!System.getActive().getAreaAt(e.getEntity().getLocation())
 						.getValue(flag, false));
 			}
 		}
@@ -118,7 +119,7 @@ public class FlagsCore extends JavaPlugin {
 				// down, not up.
 				if (e.getEntity() instanceof Player
 						&& e.getFoodLevel() < ((Player) e.getEntity()).getFoodLevel()) {
-					e.setCancelled(!Area.getAt(e.getEntity().getLocation()).getValue(flag, false));
+					e.setCancelled(!System.getActive().getAreaAt(e.getEntity().getLocation()).getValue(flag, false));
 				}
 			}
 		}
@@ -130,7 +131,7 @@ public class FlagsCore extends JavaPlugin {
 		private void onLightningStrike(LightningStrikeEvent e) {
 			final Flag flag = Flags.getRegistrar().getFlag("Lightning");
 			if (flag != null) {
-				e.setCancelled(!Area.getAt(e.getLightning().getLocation()).getValue(flag, false));
+				e.setCancelled(!System.getActive().getAreaAt(e.getLightning().getLocation()).getValue(flag, false));
 			}
 		}
 
@@ -141,13 +142,13 @@ public class FlagsCore extends JavaPlugin {
 		private void onPlayerDeath(PlayerDeathEvent e) {
 			Flag flag = Flags.getRegistrar().getFlag("KeepExpOnDeath");
 			if (flag != null
-					&& Area.getAt(e.getEntity().getLocation()).getValue(flag, false)) {
+					&& System.getActive().getAreaAt(e.getEntity().getLocation()).getValue(flag, false)) {
 				e.setKeepLevel(true);
 			}
 
             flag = Flags.getRegistrar().getFlag("KeepInventory");
             if(flag != null
-                    && Area.getAt(e.getEntity().getLocation()).getValue(flag, false)) {
+                    &&System.getActive().getAreaAt(e.getEntity().getLocation()).getValue(flag, false)) {
                 e.getDrops().clear();
             }
 		}
@@ -163,7 +164,7 @@ public class FlagsCore extends JavaPlugin {
 
             final Flag flag = Flags.getRegistrar().getFlag("CreeperExplosion");
             if(flag != null) {
-                e.setCancelled(!Area.getAt(e.getEntity().getLocation()).getValue(flag, false));
+                e.setCancelled(!System.getActive().getAreaAt(e.getEntity().getLocation()).getValue(flag, false));
             }
         }
 	}
