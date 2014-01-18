@@ -5,6 +5,9 @@ Flag:
   KeepInventory:
     Description: Toggles loss of inventory on death in the area.
     Default: false
+  DropItemsOnDeath:
+    Description: Toggles if inventory will fall to the ground when the player dies.
+    Default: true
   CreeperExplosion:
     Description: Toggles damage to blocks and players when a creeper explodes.
   Healing:

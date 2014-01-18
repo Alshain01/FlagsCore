@@ -37,9 +37,15 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.entity.*;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.weather.LightningStrikeEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -72,6 +78,8 @@ public class FlagsCore extends JavaPlugin {
 	 * The event handlers for the flags we created earlier
 	 */
 	private class CoreListener implements Listener {
+        private ConcurrentHashMap<String, ItemStack[][]> inventories = new ConcurrentHashMap<String, ItemStack[][]>();
+
 		/*
 		 * Handler for Enchanting
 		 */
@@ -148,15 +156,42 @@ public class FlagsCore extends JavaPlugin {
 
             flag = Flags.getRegistrar().getFlag("KeepInventory");
             if(flag != null
-                    &&System.getActive().getAreaAt(e.getEntity().getLocation()).getValue(flag, false)) {
+                    && System.getActive().getAreaAt(e.getEntity().getLocation()).getValue(flag, false)) {
+                ItemStack[] armor = e.getEntity().getInventory().getArmorContents();
+                ItemStack[] contents = e.getEntity().getInventory().getContents();
+                ItemStack[][] total = {armor, contents};
+                inventories.put(e.getEntity().getName(), total);
+                e.getDrops().clear();
+                return; // No need to check DropItemsOnDeath
+            }
+
+            flag = Flags.getRegistrar().getFlag("DropItemsOnDeath");
+            if(flag != null
+                    && System.getActive().getAreaAt(e.getEntity().getLocation()).getValue(flag, false)) {
                 e.getDrops().clear();
             }
 		}
 
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        private void onPlayerQuit(PlayerQuitEvent e) {
+            if(inventories.containsKey(e.getPlayer().getName())) {
+                inventories.remove(e.getPlayer().getName());
+            }
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        private void onPlayerRespawn(PlayerRespawnEvent e) {
+            if(inventories.containsKey(e.getPlayer().getName())) {
+                e.getPlayer().getInventory().setArmorContents(inventories.get(e.getPlayer().getName())[0]);
+                e.getPlayer().getInventory().setContents(inventories.get(e.getPlayer().getName())[1]);
+                inventories.remove(e.getPlayer().getName());
+            }
+        }
+
         /*
          * Handler for Creeper Explosions
          */
-        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        @EventHandler(ignoreCancelled = true)
         private void onEntityExplode(EntityExplodeEvent e) {
             if(!(e.getEntity() instanceof Creeper)) {
                 return;
