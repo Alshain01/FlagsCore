@@ -166,7 +166,7 @@ public class FlagsCore extends JavaPlugin {
 
             flag = Flags.getRegistrar().getFlag("DropItemsOnDeath");
             if(flag != null
-                    && System.getActive().getAreaAt(e.getEntity().getLocation()).getValue(flag, false)) {
+                    && !System.getActive().getAreaAt(e.getEntity().getLocation()).getValue(flag, false)) {
                 e.getDrops().clear();
             }
 		}
