@@ -44,13 +44,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.concurrent.ConcurrentHashMap;
-
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Flags - Core Module that adds general flags to the plug-in Flags.
- * 
- * @author Alshain01
+ * Flags Core - Module that adds general flags to the plug-in Flags.
  */
 public class FlagsCore extends JavaPlugin {
 	/**
@@ -69,15 +67,14 @@ public class FlagsCore extends JavaPlugin {
 		Flags.getRegistrar().register(new ModuleYML(this, "flags.yml"), "Core");
 
 		// Load plug-in events and data
-		Bukkit.getServer().getPluginManager()
-				.registerEvents(new CoreListener(), this);
+		Bukkit.getServer().getPluginManager().registerEvents(new CoreListener(), this);
 	}
 	
 	/*
 	 * The event handlers for the flags we created earlier
 	 */
 	private class CoreListener implements Listener {
-        private ConcurrentHashMap<String, ItemStack[][]> inventories = new ConcurrentHashMap<String, ItemStack[][]>();
+        private Map<String, ItemStack[][]> inventories = new HashMap<String, ItemStack[][]>();
 
 		/*
 		 * Handler for Enchanting
