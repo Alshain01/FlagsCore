@@ -46,6 +46,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Flags Core - Module that adds general flags to the plug-in Flags.
@@ -64,26 +65,36 @@ public class FlagsCore extends JavaPlugin {
 		}
 
 		// Connect to the data file and register the flags
-		Flags.getRegistrar().register(new ModuleYML(this, "flags.yml"), "Core");
+		Set<Flag> flags = Flags.getRegistrar().register(new ModuleYML(this, "flags.yml"), "Core");
+        Map<String, Flag> flagMap = new HashMap<String, Flag>();
+        for(Flag f : flags) {
+            flagMap.put(f.getName(), f);
+        }
 
 		// Load plug-in events and data
-		Bukkit.getServer().getPluginManager().registerEvents(new CoreListener(), this);
+		Bukkit.getServer().getPluginManager().registerEvents(new CoreListener(flagMap), this);
 	}
 	
 	/*
 	 * The event handlers for the flags we created earlier
 	 */
 	private class CoreListener implements Listener {
-        private Map<String, ItemStack[][]> inventories = new HashMap<String, ItemStack[][]>();
+        private final Map<String, Flag> flags;
+        private final System system = System.getActive();
+        private final Map<String, ItemStack[][]> inventories = new HashMap<String, ItemStack[][]>();
+
+        private CoreListener(Map<String, Flag> flags) {
+            this.flags = flags;
+        }
 
 		/*
 		 * Handler for Enchanting
 		 */
 		@EventHandler(ignoreCancelled = true)
 		private void onEnchantItem(EnchantItemEvent e) {
-			final Flag flag = Flags.getRegistrar().getFlag("SpendExp");
+			final Flag flag = flags.get("SpendExp");
 			if (flag != null) {
-				if (!System.getActive().getAreaAt(e.getEnchantBlock().getLocation()).getValue(flag, false)) {
+				if (!system.getAreaAt(e.getEnchantBlock().getLocation()).getValue(flag, false)) {
 					e.setExpLevelCost(0);
 				}
 			}
@@ -94,9 +105,9 @@ public class FlagsCore extends JavaPlugin {
 		 */
 		@EventHandler(ignoreCancelled = true)
 		private void onEntityBreakDoor(EntityBreakDoorEvent e) {
-			final Flag flag = Flags.getRegistrar().getFlag("DoorBreak");
+			final Flag flag = flags.get("DoorBreak");
 			if (flag != null) {
-				e.setCancelled(!System.getActive().getAreaAt(e.getEntity().getLocation()).getValue(flag, false));
+				e.setCancelled(!system.getAreaAt(e.getEntity().getLocation()).getValue(flag, false));
 			}
 		}
 
@@ -105,10 +116,9 @@ public class FlagsCore extends JavaPlugin {
 		 */
 		@EventHandler(ignoreCancelled = true)
 		private void onEntityRegainHealth(EntityRegainHealthEvent e) {
-			final Flag flag = Flags.getRegistrar().getFlag("Healing");
+			final Flag flag = flags.get("Healing");
 			if (flag != null && e.getEntity() instanceof Player) {
-				e.setCancelled(!System.getActive().getAreaAt(e.getEntity().getLocation())
-						.getValue(flag, false));
+				e.setCancelled(!system.getAreaAt(e.getEntity().getLocation()).getValue(flag, false));
 			}
 		}
 
@@ -117,13 +127,12 @@ public class FlagsCore extends JavaPlugin {
 		 */
 		@EventHandler(ignoreCancelled = true)
 		private void onFoodLevelChange(FoodLevelChangeEvent e) {
-			final Flag flag = Flags.getRegistrar().getFlag("Hunger");
+			final Flag flag = flags.get("Hunger");
 			if (flag != null) {
 				// Make sure it's a player and make sure the hunger bar is going
 				// down, not up.
-				if (e.getEntity() instanceof Player
-						&& e.getFoodLevel() < ((Player) e.getEntity()).getFoodLevel()) {
-					e.setCancelled(!System.getActive().getAreaAt(e.getEntity().getLocation()).getValue(flag, false));
+				if (e.getEntity() instanceof Player && e.getFoodLevel() < ((Player) e.getEntity()).getFoodLevel()) {
+					e.setCancelled(!system.getAreaAt(e.getEntity().getLocation()).getValue(flag, false));
 				}
 			}
 		}
@@ -133,9 +142,9 @@ public class FlagsCore extends JavaPlugin {
 		 */
 		@EventHandler(ignoreCancelled = true)
 		private void onLightningStrike(LightningStrikeEvent e) {
-			final Flag flag = Flags.getRegistrar().getFlag("Lightning");
+			final Flag flag = flags.get("Lightning");
 			if (flag != null) {
-				e.setCancelled(!System.getActive().getAreaAt(e.getLightning().getLocation()).getValue(flag, false));
+				e.setCancelled(!system.getAreaAt(e.getLightning().getLocation()).getValue(flag, false));
 			}
 		}
 
@@ -144,15 +153,13 @@ public class FlagsCore extends JavaPlugin {
 		 */
 		@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 		private void onPlayerDeath(PlayerDeathEvent e) {
-			Flag flag = Flags.getRegistrar().getFlag("KeepExpOnDeath");
-			if (flag != null
-					&& System.getActive().getAreaAt(e.getEntity().getLocation()).getValue(flag, false)) {
+			Flag flag = flags.get("KeepExpOnDeath");
+			if (flag != null && system.getAreaAt(e.getEntity().getLocation()).getValue(flag, false)) {
 				e.setKeepLevel(true);
 			}
 
-            flag = Flags.getRegistrar().getFlag("KeepInventory");
-            if(flag != null
-                    && System.getActive().getAreaAt(e.getEntity().getLocation()).getValue(flag, false)) {
+            flag = flags.get("KeepInventory");
+            if(flag != null && system.getAreaAt(e.getEntity().getLocation()).getValue(flag, false)) {
                 ItemStack[] armor = e.getEntity().getInventory().getArmorContents();
                 ItemStack[] contents = e.getEntity().getInventory().getContents();
                 ItemStack[][] total = {armor, contents};
@@ -161,9 +168,8 @@ public class FlagsCore extends JavaPlugin {
                 return; // No need to check DropItemsOnDeath
             }
 
-            flag = Flags.getRegistrar().getFlag("DropItemsOnDeath");
-            if(flag != null
-                    && !System.getActive().getAreaAt(e.getEntity().getLocation()).getValue(flag, false)) {
+            flag = flags.get("DropItemsOnDeath");
+            if(flag != null && !system.getAreaAt(e.getEntity().getLocation()).getValue(flag, false)) {
                 e.getDrops().clear();
             }
 		}
@@ -193,9 +199,9 @@ public class FlagsCore extends JavaPlugin {
                 return;
             }
 
-            final Flag flag = Flags.getRegistrar().getFlag("CreeperExplosion");
+            final Flag flag = flags.get("CreeperExplosion");
             if(flag != null) {
-                e.setCancelled(!System.getActive().getAreaAt(e.getEntity().getLocation()).getValue(flag, false));
+                e.setCancelled(!system.getAreaAt(e.getEntity().getLocation()).getValue(flag, false));
             }
         }
 	}
