@@ -23,7 +23,7 @@
 		<dependency>
 			<groupId>io.github.alshain01.flags</groupId>
 			<artifactId>Flags</artifactId>
-			<version>RELEASE</version>
+			<version>LATEST</version>
 		</dependency>
 	</dependencies>
 
