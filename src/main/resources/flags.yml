@@ -1,12 +1,12 @@
 Flag:
   KeepExpOnDeath:
-    Description: Toggles loss of exp on death in the area.
+    Description: Toggles exp loss on death in the area.
     Default: false
   KeepInventory:
-    Description: Toggles loss of inventory on death in the area.
+    Description: Toggles inventory loss on death in the area. Includes DropItemsOnDeath functionality.
     Default: false
   DropItemsOnDeath:
-    Description: Toggles if inventory will fall to the ground when the player dies.
+    Description: Toggles inventory dropping when the player dies.
     Default: true
   CreeperExplosion:
     Description: Toggles damage to blocks and players when a creeper explodes.
@@ -17,6 +17,6 @@ Flag:
   Hunger:
     Description: Toggles getting hungry.
   SpendExp:
-    Description: Toggles exp loss when using enchanting or anvil.
+    Description: Toggles exp loss when enchanting or anvil use.
   Lightning:
     Description: Toggles lightning striking in an area.
