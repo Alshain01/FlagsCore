@@ -27,7 +27,7 @@ package io.github.alshain01.flagscore;
 import io.github.alshain01.flags.Flag;
 import io.github.alshain01.flags.Flags;
 import io.github.alshain01.flags.ModuleYML;
-import io.github.alshain01.flags.System;
+import io.github.alshain01.flags.CuboidType;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Creeper;
@@ -51,6 +51,7 @@ import java.util.Set;
 /**
  * Flags Core - Module that adds general flags to the plug-in Flags.
  */
+@SuppressWarnings("unused")
 public class FlagsCore extends JavaPlugin {
 	/**
 	 * Called when this module is enabled
@@ -80,7 +81,7 @@ public class FlagsCore extends JavaPlugin {
 	 */
 	private class CoreListener implements Listener {
         private final Map<String, Flag> flags;
-        private final System system = System.getActive();
+        private final CuboidType system = CuboidType.getActive();
         private final Map<String, ItemStack[][]> inventories = new HashMap<String, ItemStack[][]>();
 
         private CoreListener(Map<String, Flag> flags) {

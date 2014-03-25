@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.github.alshain01.flagscore</groupId>
 	<artifactId>FlagsCore</artifactId>
-	<version>1.4.0</version>
+	<version>1.4.2</version>
 	<name>${project.artifactId}</name>
 	<description>Module that adds general flags to the Flags plugin.</description>
 	<url>http://dev.bukkit.org/bukkit-plugins/flags/</url>
