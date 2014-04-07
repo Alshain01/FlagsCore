@@ -24,12 +24,11 @@
 
 package io.github.alshain01.flagscore;
 
-import io.github.alshain01.flags.Flag;
-import io.github.alshain01.flags.Flags;
-import io.github.alshain01.flags.ModuleYML;
-import io.github.alshain01.flags.CuboidType;
+import io.github.alshain01.flags.api.Flag;
+import io.github.alshain01.flags.api.FlagsAPI;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -47,6 +46,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Flags Core - Module that adds general flags to the plug-in Flags.
@@ -63,10 +63,12 @@ public class FlagsCore extends JavaPlugin {
 		if (!pm.isPluginEnabled("Flags")) {
 			getLogger().severe("Flags was not found. Shutting down.");
 			pm.disablePlugin(this);
+            return;
 		}
 
 		// Connect to the data file and register the flags
-		Set<Flag> flags = Flags.getRegistrar().register(new ModuleYML(this, "flags.yml"), "Core");
+        YamlConfiguration flagConfig = YamlConfiguration.loadConfiguration(getResource("flags.yml"));
+        Set<Flag> flags = FlagsAPI.getRegistrar().register(flagConfig, "Core");
         Map<String, Flag> flagMap = new HashMap<String, Flag>();
         for(Flag f : flags) {
             flagMap.put(f.getName(), f);
@@ -81,8 +83,7 @@ public class FlagsCore extends JavaPlugin {
 	 */
 	private class CoreListener implements Listener {
         private final Map<String, Flag> flags;
-        private final CuboidType system = CuboidType.getActive();
-        private final Map<String, ItemStack[][]> inventories = new HashMap<String, ItemStack[][]>();
+        private final Map<UUID, ItemStack[][]> inventories = new HashMap<UUID, ItemStack[][]>();
 
         private CoreListener(Map<String, Flag> flags) {
             this.flags = flags;
@@ -95,7 +96,7 @@ public class FlagsCore extends JavaPlugin {
 		private void onEnchantItem(EnchantItemEvent e) {
 			final Flag flag = flags.get("SpendExp");
 			if (flag != null) {
-				if (!system.getAreaAt(e.getEnchantBlock().getLocation()).getValue(flag, false)) {
+				if (!FlagsAPI.getAreaAt(e.getEnchantBlock().getLocation()).getValue(flag, false)) {
 					e.setExpLevelCost(0);
 				}
 			}
@@ -108,7 +109,7 @@ public class FlagsCore extends JavaPlugin {
 		private void onEntityBreakDoor(EntityBreakDoorEvent e) {
 			final Flag flag = flags.get("DoorBreak");
 			if (flag != null) {
-				e.setCancelled(!system.getAreaAt(e.getEntity().getLocation()).getValue(flag, false));
+				e.setCancelled(!FlagsAPI.getAreaAt(e.getEntity().getLocation()).getValue(flag, false));
 			}
 		}
 
@@ -119,7 +120,7 @@ public class FlagsCore extends JavaPlugin {
 		private void onEntityRegainHealth(EntityRegainHealthEvent e) {
 			final Flag flag = flags.get("Healing");
 			if (flag != null && e.getEntity() instanceof Player) {
-				e.setCancelled(!system.getAreaAt(e.getEntity().getLocation()).getValue(flag, false));
+				e.setCancelled(!FlagsAPI.getAreaAt(e.getEntity().getLocation()).getValue(flag, false));
 			}
 		}
 
@@ -133,7 +134,7 @@ public class FlagsCore extends JavaPlugin {
 				// Make sure it's a player and make sure the hunger bar is going
 				// down, not up.
 				if (e.getEntity() instanceof Player && e.getFoodLevel() < ((Player) e.getEntity()).getFoodLevel()) {
-					e.setCancelled(!system.getAreaAt(e.getEntity().getLocation()).getValue(flag, false));
+					e.setCancelled(!FlagsAPI.getAreaAt(e.getEntity().getLocation()).getValue(flag, false));
 				}
 			}
 		}
@@ -145,7 +146,7 @@ public class FlagsCore extends JavaPlugin {
 		private void onLightningStrike(LightningStrikeEvent e) {
 			final Flag flag = flags.get("Lightning");
 			if (flag != null) {
-				e.setCancelled(!system.getAreaAt(e.getLightning().getLocation()).getValue(flag, false));
+				e.setCancelled(!FlagsAPI.getAreaAt(e.getLightning().getLocation()).getValue(flag, false));
 			}
 		}
 
@@ -155,39 +156,39 @@ public class FlagsCore extends JavaPlugin {
 		@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 		private void onPlayerDeath(PlayerDeathEvent e) {
 			Flag flag = flags.get("KeepExpOnDeath");
-			if (flag != null && system.getAreaAt(e.getEntity().getLocation()).getValue(flag, false)) {
+			if (flag != null && FlagsAPI.getAreaAt(e.getEntity().getLocation()).getValue(flag, false)) {
 				e.setKeepLevel(true);
 			}
 
             flag = flags.get("KeepInventory");
-            if(flag != null && system.getAreaAt(e.getEntity().getLocation()).getValue(flag, false)) {
+            if(flag != null && FlagsAPI.getAreaAt(e.getEntity().getLocation()).getValue(flag, false)) {
                 ItemStack[] armor = e.getEntity().getInventory().getArmorContents();
                 ItemStack[] contents = e.getEntity().getInventory().getContents();
                 ItemStack[][] total = {armor, contents};
-                inventories.put(e.getEntity().getName(), total);
+                inventories.put(e.getEntity().getUniqueId(), total);
                 e.getDrops().clear();
                 return; // No need to check DropItemsOnDeath
             }
 
             flag = flags.get("DropItemsOnDeath");
-            if(flag != null && !system.getAreaAt(e.getEntity().getLocation()).getValue(flag, false)) {
+            if(flag != null && !FlagsAPI.getAreaAt(e.getEntity().getLocation()).getValue(flag, false)) {
                 e.getDrops().clear();
             }
 		}
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         private void onPlayerQuit(PlayerQuitEvent e) {
-            if(inventories.containsKey(e.getPlayer().getName())) {
-                inventories.remove(e.getPlayer().getName());
+            if(inventories.containsKey(e.getPlayer().getUniqueId())) {
+                inventories.remove(e.getPlayer().getUniqueId());
             }
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         private void onPlayerRespawn(PlayerRespawnEvent e) {
-            if(inventories.containsKey(e.getPlayer().getName())) {
-                e.getPlayer().getInventory().setArmorContents(inventories.get(e.getPlayer().getName())[0]);
-                e.getPlayer().getInventory().setContents(inventories.get(e.getPlayer().getName())[1]);
-                inventories.remove(e.getPlayer().getName());
+            if(inventories.containsKey(e.getPlayer().getUniqueId())) {
+                e.getPlayer().getInventory().setArmorContents(inventories.get(e.getPlayer().getUniqueId())[0]);
+                e.getPlayer().getInventory().setContents(inventories.get(e.getPlayer().getUniqueId())[1]);
+                inventories.remove(e.getPlayer().getUniqueId());
             }
         }
 
@@ -202,7 +203,7 @@ public class FlagsCore extends JavaPlugin {
 
             final Flag flag = flags.get("CreeperExplosion");
             if(flag != null) {
-                e.setCancelled(!system.getAreaAt(e.getEntity().getLocation()).getValue(flag, false));
+                e.setCancelled(!FlagsAPI.getAreaAt(e.getEntity().getLocation()).getValue(flag, false));
             }
         }
 	}
