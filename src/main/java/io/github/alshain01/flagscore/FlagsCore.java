@@ -96,7 +96,7 @@ public class FlagsCore extends JavaPlugin {
 		private void onEnchantItem(EnchantItemEvent e) {
 			final Flag flag = flags.get("SpendExp");
 			if (flag != null) {
-				if (!FlagsAPI.getAreaAt(e.getEnchantBlock().getLocation()).getValue(flag, false)) {
+				if (!FlagsAPI.getAreaAt(e.getEnchantBlock().getLocation()).getState(flag, false)) {
 					e.setExpLevelCost(0);
 				}
 			}
@@ -109,7 +109,7 @@ public class FlagsCore extends JavaPlugin {
 		private void onEntityBreakDoor(EntityBreakDoorEvent e) {
 			final Flag flag = flags.get("DoorBreak");
 			if (flag != null) {
-				e.setCancelled(!FlagsAPI.getAreaAt(e.getEntity().getLocation()).getValue(flag, false));
+				e.setCancelled(!FlagsAPI.getAreaAt(e.getEntity().getLocation()).getState(flag, false));
 			}
 		}
 
@@ -120,7 +120,7 @@ public class FlagsCore extends JavaPlugin {
 		private void onEntityRegainHealth(EntityRegainHealthEvent e) {
 			final Flag flag = flags.get("Healing");
 			if (flag != null && e.getEntity() instanceof Player) {
-				e.setCancelled(!FlagsAPI.getAreaAt(e.getEntity().getLocation()).getValue(flag, false));
+				e.setCancelled(!FlagsAPI.getAreaAt(e.getEntity().getLocation()).getState(flag, false));
 			}
 		}
 
@@ -134,7 +134,7 @@ public class FlagsCore extends JavaPlugin {
 				// Make sure it's a player and make sure the hunger bar is going
 				// down, not up.
 				if (e.getEntity() instanceof Player && e.getFoodLevel() < ((Player) e.getEntity()).getFoodLevel()) {
-					e.setCancelled(!FlagsAPI.getAreaAt(e.getEntity().getLocation()).getValue(flag, false));
+					e.setCancelled(!FlagsAPI.getAreaAt(e.getEntity().getLocation()).getState(flag, false));
 				}
 			}
 		}
@@ -146,7 +146,7 @@ public class FlagsCore extends JavaPlugin {
 		private void onLightningStrike(LightningStrikeEvent e) {
 			final Flag flag = flags.get("Lightning");
 			if (flag != null) {
-				e.setCancelled(!FlagsAPI.getAreaAt(e.getLightning().getLocation()).getValue(flag, false));
+				e.setCancelled(!FlagsAPI.getAreaAt(e.getLightning().getLocation()).getState(flag, false));
 			}
 		}
 
@@ -156,12 +156,12 @@ public class FlagsCore extends JavaPlugin {
 		@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 		private void onPlayerDeath(PlayerDeathEvent e) {
 			Flag flag = flags.get("KeepExpOnDeath");
-			if (flag != null && FlagsAPI.getAreaAt(e.getEntity().getLocation()).getValue(flag, false)) {
+			if (flag != null && FlagsAPI.getAreaAt(e.getEntity().getLocation()).getState(flag, false)) {
 				e.setKeepLevel(true);
 			}
 
             flag = flags.get("KeepInventory");
-            if(flag != null && FlagsAPI.getAreaAt(e.getEntity().getLocation()).getValue(flag, false)) {
+            if(flag != null && FlagsAPI.getAreaAt(e.getEntity().getLocation()).getState(flag, false)) {
                 ItemStack[] armor = e.getEntity().getInventory().getArmorContents();
                 ItemStack[] contents = e.getEntity().getInventory().getContents();
                 ItemStack[][] total = {armor, contents};
@@ -171,7 +171,7 @@ public class FlagsCore extends JavaPlugin {
             }
 
             flag = flags.get("DropItemsOnDeath");
-            if(flag != null && !FlagsAPI.getAreaAt(e.getEntity().getLocation()).getValue(flag, false)) {
+            if(flag != null && !FlagsAPI.getAreaAt(e.getEntity().getLocation()).getState(flag, false)) {
                 e.getDrops().clear();
             }
 		}
@@ -203,7 +203,7 @@ public class FlagsCore extends JavaPlugin {
 
             final Flag flag = flags.get("CreeperExplosion");
             if(flag != null) {
-                e.setCancelled(!FlagsAPI.getAreaAt(e.getEntity().getLocation()).getValue(flag, false));
+                e.setCancelled(!FlagsAPI.getAreaAt(e.getEntity().getLocation()).getState(flag, false));
             }
         }
 	}
